@@ -1,0 +1,24 @@
+#first {
+    width: 100px;
+    margin-top: 10px;
+    float: left;
+    height: 300px;
+}
+#second {
+    margin-top: 30px;
+    margin-right: 50px;
+    width: 700px;
+    float: right;
+    height: 300px;
+}
+
+#product_name{
+    display: inline;
+    font-size: larger;
+    font-weight: bolder;
+}
+
+#product_name:hover{
+    text-decoration: underline;
+    cursor: pointer;
+}

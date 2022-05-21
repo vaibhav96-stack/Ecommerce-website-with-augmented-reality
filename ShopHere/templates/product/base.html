@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+{% load static %}
+{% load crispy_forms_tags %}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="{% static 'css/bootstrap_min.css' %}">
+  <script src="{% static 'js/jquery_min.js' %}"></script>
+  <script src="{% static 'js/bootstrap_min.js' %}"></script>
+  {% block head %}
+  {% endblock %}
+
+<script>
+
+// $(document).ready(function(){
+
+// });
+
+function navlink_not_login(){
+  document.getElementById('link1').innerHTML = 'Login'
+  document.getElementById('link2').innerHTML = 'Signup'
+  $("#link1").attr("data-toggle", "modal");
+  $("#link1").attr("data-target", "#myModalLogin");
+  $("#link2").attr("data-toggle", "modal");
+  $("#link2").attr("data-target", "#myModalSignup");
+}
+
+function navlink_login(a){
+  document.getElementById('link1').innerHTML = 'Hello ' + a
+  document.getElementById('link2').innerHTML = 'Logout'
+  document.getElementById('link2').href = "{% url 'logout' %}"
+}
+
+$(document).on('submit','#login_form', function(e){
+
+e.preventDefault();
+var login_form = $('#login_form');
+var action = login_form.attr('action');
+var method = login_form.attr('method');
+var data_ = login_form.serialize();
+// console.log(data_)
+$.ajax({
+    type: method,
+    url: action,
+    data: data_,
+    success: function(data, status) {
+      // console.log(data)
+        if (data.status == 'OK') {
+            location.reload()
+        }else{
+          if (data.errors != undefined)
+            document.getElementById('login_error').innerHTML = data.errors
+        }
+    }
+});
+
+return false;
+});
+
+
+
+$(document).on('submit','#signup_form', function(e){
+
+e.preventDefault();
+var signup_form = $('#signup_form');
+var action = signup_form.attr('action');
+var method = signup_form.attr('method');
+var data_ = signup_form.serialize();
+
+$.ajax({
+    type: method,
+    url: action,
+    data: data_,
+    success: function(data, status) {
+      // console.log(data)
+        if (data.status == 'OK') {
+            location.reload()
+        }else{
+          if (data.errors.username != undefined)
+            document.getElementById('signup_username_error').innerHTML = data.errors.username
+          if (data.errors.password2 != undefined)
+            document.getElementById('signup_password_error').innerHTML = data.errors.password2
+        }
+    }
+});
+
+return false;
+});
+
+</script>
+
+</head>
+
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-dark navbar-dark" style="width:100%;">
+      <div class="container">
+        <a class="navbar-brand" href="/">
+          <img src="/media/logo.jpeg" class="rounded img-fluid" alt="shopHere" style="width:40px;border-radius: 10px">
+        </a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" id = 'home' href="{% url 'mainpage' %}">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id = 'about' href="{% url 'about' %}">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id = 'contact' href="{% url 'contact' %}">Contact</a>
+            </li>
+          </ul>
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" id = 'link1' href="#"></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id = 'link2' href="#"></a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <nav class="navbar navbar-expand-lg bg-dark navbar-dark" style="width:100%;">
+        <div class="container">
+
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="collapsibleNavbar">
+          <ul class="navbar-nav mr-auto">
+            {% for category,value in data.items %}
+              <li class="nav-item">
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="{{ category }}">
+                    {{ category }}
+                  </a>
+                  <div class="dropdown-menu">
+                      {% for subcategory in value %}
+                      <a class="dropdown-item" href="{% url 'subproduct' subcat=subcategory.id %}" id="{{ subcategory.name }}">
+                        <img src="/media/{{ subcategory.categoryIcon }}" height="20px" width="20px">
+                        {{ subcategory.name }}
+                      </a>
+                      {% endfor %}
+                  </div>
+                </li>
+              </li>
+              {% endfor %}
+
+
+              {% if not request.user.is_authenticated %}
+              <!-- Sign in page -->
+              <script>navlink_not_login()</script>
+
+              <div id="myModalLogin" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h4 class="modal-title" style="margin-left: 40%">Sign in</h4>
+                      <button type="button" class="close" data-dismiss="modal" style="margin-left: 10%">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                      <form action = "{% url 'login' %}" method = 'post' id = "login_form">
+                          {% csrf_token %}
+                          <strong><p id="login_error" class="text-danger" style="font-weight: 550;"></p></strong>
+                          {{ login_form|crispy }}
+                          <div class="text-center">
+                              <button type="submit" class="btn btn-primary">Sign in</button>
+                          </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sign up form -->
+
+              <div id="myModalSignup" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h4 class="modal-title" style="margin-left: 40%">Sign up</h4>
+                      <button type="button" class="close" data-dismiss="modal" style="margin-left: 10%">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                      <form action="{% url 'signup' %}" method="post" id="signup_form">
+                          {% csrf_token %}
+                          {{ signup_form.first_name|as_crispy_field }}
+                          {{ signup_form.last_name|as_crispy_field }}
+                          {{ signup_form.username|as_crispy_field }}
+                          <strong><p id="signup_username_error" class="text-danger" style="font-weight: 550;"></p></strong>
+
+                          {{ signup_form.email|as_crispy_field }}
+                          {{ signup_form.password1|as_crispy_field }}
+                          {{ signup_form.password2|as_crispy_field }}
+                          <strong><p id="signup_password_error" class="text-danger" style="font-weight: 550;"></p></strong>
+                          <div class="text-center">
+                              <button type="submit" class="btn btn-primary">Sign up</button>
+                          </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {% else %}
+              <div>
+                <script>
+                  var a = "{{request.user.username}}"
+                  navlink_login(a)
+                </script>
+              </div>
+              {% endif %}
+
+
+            </ul>
+          </div>
+        </div>
+      </nav>
+  <div class="container">
+    {% block content %}
+    {% endblock %}
+  </div>
+</body>
+</html>

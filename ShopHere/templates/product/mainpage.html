@@ -1,0 +1,42 @@
+{% extends 'product/base.html' %}
+
+{% load crispy_forms_tags %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/mainpage.css' %}">
+{% endblock %}
+
+{% block content%}
+
+<br>
+{% for subcategory,value in products.items %}
+<div>
+  {% if value %}
+  <p id="{{ subcategory }}">Top picks in {{ subcategory }}</p>
+  {% endif %}
+    <div class="row">
+      {% for product in value %}
+      <div class="card col col-md-2" style="width:220px;margin-right: 15px;">
+          <a href="{% url 'productpage' product.id %}" style="color: inherit;text-decoration: none;">
+            <div style="margin-left: auto;margin-right: auto;">
+                <img class="card-img-top product_image" src="media/{{ product.image }}" alt="Card image" style="height:30%; width:30%;margin-left: 55px;">
+                <div class="card-body">
+                  <h4 class="card-title" style="font-size: 13px;">{{ product.name }}</h4>
+                  <p class="card-text" style="color:red;margin-bottom: 1px;">Rs. {{ product.price }}</p>
+                  {% if product.stock != 0 %}
+                    <h6 class="card-text" style="color:green;font-size: smaller;">In Stock</h6>
+                  {% else %}
+                    <h6 class="card-text" style="color:rgb(136, 4, 4);font-size: smaller;">Out of Stock</h6>
+                  {% endif %}
+                  <!-- <a href="#" class="btn btn-primary stretched-link" style="margin-left:20%;">See Details</a> -->
+                </div>
+            </div>
+          </a>
+      </div>
+    {% endfor %}
+    </div>
+</div>
+<br>
+{% endfor %}
+
+{% endblock %}

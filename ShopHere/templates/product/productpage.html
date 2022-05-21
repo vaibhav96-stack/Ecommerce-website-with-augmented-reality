@@ -1,0 +1,94 @@
+{% extends 'product/base.html' %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+{% block head %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/productpage.css' %}">
+<script type="text/javascript" src="{% static 'js/tinymce/tinymce.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/tinymce/tinymce.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/tinymce/jquery.tinymce.min.js' %}"></script>
+
+<script>
+
+$(window).bind("pageshow", function(event) {
+    if (event.originalEvent.persisted) {
+        console.log("reloading")
+        window.location.reload();
+    }
+});
+
+function check_login(product_id,product_price){
+    var a = "{{request.user.username}}"
+    if (a){
+        if (document.getElementById("add_item_button").innerHTML == "Go to cart"){
+            document.getElementById("add_item_button").href = "{% url 'cart' %}"
+        }
+        else{
+            $(document).on('click','#add_item_button', function(e){
+
+            e.preventDefault();
+            var action = "{% url 'add_to_cart' %}"
+            var method = 'POST'
+            var data_ = {'product_id':product_id,'product_price':product_price}
+
+            $.ajax({
+                type: method,
+                url: action,
+                data: data_,
+                success: function(data, status) {
+                    if (data.status == 'OK') {
+                        location.reload()
+                    }
+                }
+            });
+            return false;
+            });
+
+            document.getElementById("add_item_button").innerHTML = "Go to cart"
+        }
+    }
+    else
+        $("#myModalLogin").modal();
+}
+
+function out_of_stock_error(){
+    var a = "{{request.user.username}}"
+    if (a){
+        alert("Product is currently out of stock!");
+    }
+    else
+        $("#myModalLogin").modal();
+}
+
+
+
+</script>
+{% endblock %}
+
+{% block content%}
+<div>
+    <div id="first" style="max-height: 500px; min-height: 500px; min-width: 300px; max-width: 300px; position: relative;">
+        <img src="/media/{{ product_detail.image }}" style="position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);">
+    </div>
+    <div id="second">
+        <h3 id="product_name">{{ product_detail.name }}</h3><br>
+        <p class="card-text" style="color:red;margin-bottom: 1px;margin-top: 6px;font-size: large">Rs. {{ product_detail.price }}</p>
+        {% if product_detail.stock != 0 %}
+            <h6 class="card-text" style="color:green;font-size: smaller;">In Stock</h6>
+        {% else %}
+            <h6 class="card-text" style="color:rgb(136, 4, 4);font-size: smaller;">Out of Stock</h6>
+        {% endif %}
+        <br><strong><h5 style="font-weight: 500;">Description :</h5></strong>
+        <p>{{ product_detail.description|safe }}</p>
+        <a href="{% url 'arr_real' product_id=product_detail.id %}" class="btn btn-primary" style="background: orange;">Augmented reality</a>
+        <!-- <a onclick="check_login()" href="#" id="buy_button" class="btn btn-primary" style="background: orange;">Buy Now</a> -->
+        {% if product_detail.stock != 0 and product_exist == 'No' %}
+            <a onclick="check_login('{{ product_detail.id }}','{{ product_detail.price }}')" href="#" id="add_item_button" class="btn btn-primary" style="background: orange;">Add to cart</a>
+        {% elif product_detail.stock != 0 and product_exist == 'Yes' %}
+            <a onclick="check_login('{{ product_detail.id }}','{{ product_detail.price }}')" href="#" id="add_item_button" class="btn btn-primary" style="background: orange;">Go to cart</a>
+        {% else %}
+           <a onclick="out_of_stock_error()" href="#" id="add_item_button" class="btn btn-primary" style="background: orange;">Add to cart</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

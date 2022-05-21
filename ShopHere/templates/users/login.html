@@ -1,0 +1,22 @@
+{% extends 'users/base.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block head %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/login1.css' %}">
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    {% csrf_token %}
+    <p id = "test">trjt</p>
+    <div class="form-group col-md-6 mb-0">
+      {{ form.username|as_crispy_field }}
+    </div>
+    <div class="form-group col-md-6 mb-0">
+      {{ form.password|as_crispy_field }}
+    </div>
+    <button type="submit" class="btn btn-primary">Sign in</button>
+  </form>
+{% endblock %}

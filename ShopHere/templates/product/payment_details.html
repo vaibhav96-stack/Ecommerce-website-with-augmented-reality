@@ -1,0 +1,34 @@
+{% extends 'product/base.html' %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+{% block head %}
+{% endblock %}
+
+{% block content %}
+<br><h3 style="color: green;">Thank You for shopping</h3><br>
+<br><h4>Order Summary :-</h4>
+<br>
+<div>
+    {% for product,amount in purchases %}
+        <div style="border: double 1px black;border-radius: 15px;height: 240px;border-width: thin;border-style: outset;width: 1080px;">
+            <div style="width: 100px;margin-top: 10px;float: left;height: 200px;">
+                <img src="/media/{{ product.name.image }}" height=170px width=100px style="margin-top: 15px;margin-left: 35px;">
+            </div>
+            <div style="margin-left: 200px;">
+                <div style="margin-top: 30px; width: 500px;height: 200px; float: left;">
+                    <p style="font-size: medium;">{{ product.name.name }}</p>
+                    <p style="color:red;margin-bottom: 1px;margin-top: 6px;font-size: medium;">Rs. {{ product.name.price }}</p>
+                    <label>Quantity : {{ product.quantity }}</label>
+                </div>
+                <div style="width: 300px;margin-left: 550px; padding-top:150px;">
+                    <p style="font-weight: bold">Total product cost : <span style="color: red;">{{ amount }}</span></p>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <div style="float: right;">
+        <p style="font-weight: bold;margin-right: 100px;margin-top: 50px;margin-bottom: 10px;">Amount Paid : <span style="color: red;">{{ cart.total_payment }}</span></p>
+    </div>
+</div>
+{% endblock %}

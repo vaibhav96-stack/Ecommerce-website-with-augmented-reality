@@ -1,0 +1,13 @@
+#search_field{
+    float: left;
+}
+
+#search_button{
+    float: right;
+}
+
+.product_image{
+    width: 50%;
+    margin-left: 74px;
+    margin-top: 10px;
+}
